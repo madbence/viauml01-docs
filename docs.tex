@@ -2,7 +2,12 @@
 
 \usepackage{xltxtra}
 \usepackage{graphicx}
+\usepackage{setspace}
 \usepackage[magyar]{babel}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt plus 3pt minus 3pt}
+\onehalfspacing
 
 \begin{document}
 \begin{titlepage}
@@ -37,10 +42,74 @@
   \end{center}
 \end{titlepage}
 \section{A feladat}
+
+A félév során elvégzendő feladat egy több szereplős játék elkészítése volt,
+mely során az én feladatom a játék logikájának megtervezése és implementálása,
+valamint a kliens és a szerver közötti kommunikáció megvalósítása volt.
+
+A játékban a játékosok egy űrhajót irányítanak a billentyűzet segítségével,
+amivel az űrhajó hajtóműveit tudják ki és bekapcsolni.
+A játék célja a többi játékos kiiktatása, ezt az űrhajóra szerelt fegyverekkel
+lehet megtenni.
+
 \section{Felhasznált techonlógiák}
+
+Az elkészült alkalmazás ES2015 nyelven készült el, ez a JavaScript 2015 nyarán
+szabványosított változata. A szerver NodeJS környezetben fut, így a kliens és
+a szerver nagy arányban használja ugyanazt a kódot.
+
+A kliens-szerver kommunikáció Websocket technológián alapul.
+Számos absztrakció létezik a kommunikáció részleteinek elfedésére (EngineIO, Primus),
+én azonban az overhead elkerülése végett ezeket nem használtam, pusztán
+a natív Websocket API-ra.
+
+A szerver oldali kiszolgálás a koa webszerver végzi, ami a népszerű express
+szerver következő generációs verziója. A modul API-ja könnyen olvasható,
+a kiszolgálásért ún. middleware-ek felelősek. Ezek aszinkron módon működnek,
+amit a koa egy generátor alapú megoldással tesz kényelmessé.
+Hagyományosan a nyelvben az aszinkron műveletek eredménye (vagy sikertelensége)
+egy ún. callback függvényben kezelhető le (hasonlóan a Java/C\#-ban ismert eseménykezelőkhöz),
+ezt egyszerűsíti le a generátor alapú szintaxis, ami a C\#-ban meglévő async/await
+konstrukciónak felel meg. Jó hír, hogy a nyelv következő változata (ES2016) már
+tartalmazni fog egy hasonló konstrukciót.
+Mivel az alkalmazás kódját a Babel transpiler fordítja le futtatható JavaScript
+kódra, így ez a kényelmes konstrukció már elérhető volt számomra is.
+
 \subsection{Babel}
+
+A Babel (korábban 6to5) egy ún. transpiler, azaz olyan compiler, amiben a forrás
+és a célnyelv ugyanaz. A feladata a böngészők (illetve a NodeJS futtatókörnyezet)
+által még nem futtatható JavaScript kód (ES2015) transzformálása egy korábbi,
+általánosan elérhető dialektusra (ES5).
+
+Mivel az alkalmazás moduláris felépítésű, így szükség van az elkészült állományok
+összecsomagolására, ez a böngésző számára a hatékonyabb betöltés miatt szükséges.
+Ezt könnyíti meg a browserify csomag, ami a forrásfájlokból egyetlen, a kliens
+által futtatható bundle-t csinál.
+Fejlesztés közben a teljes fordítás sajnos nagyon lassú (ahogy minden más nyelvben),
+így a folyamat felgyorsítására a watchify csomagot használtam, ami inkrementális
+fordítást biztosít, illetve folyamatosan figyeli a forrásfájlokat,
+így a fordítás automatikus.
+
 \subsection{Flowtype}
+
+A JavaScript nyelv egyik nagy hátrányának a statikus típusosság hiányát tartják.
+Erre nyújt megoldás a Facebook techonlógiája, a Flowtype, mely a nyelvet
+új nyelvi elemekkel (típusannotációkkal) egészíti ki, és lehetőséget ad a program
+típushelyességének bizonyítására, mindezt a fordítási folyamat részeként.
+
+% TODO: opt-in typing, inferring, etc
+
 \section{Az elkészült alkalmazás}
+
+% TODO: arch, basic overview
+
 \subsection{Perzisztens adatstruktúrák}
+
+% TODO: redux, game logics here
+
 \section{Továbbfejlesztési lehetőségek}
+
+% TODO: scriptable, design ships, etc,
+
 \end{document}
