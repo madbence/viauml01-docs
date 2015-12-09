@@ -98,7 +98,11 @@ Erre nyújt megoldás a Facebook techonlógiája, a Flowtype, mely a nyelvet
 új nyelvi elemekkel (típusannotációkkal) egészíti ki, és lehetőséget ad a program
 típushelyességének bizonyítására, mindezt a fordítási folyamat részeként.
 
-% TODO: opt-in typing, inferring, etc
+A típusellenőrzés opcionális, a @flow direktívával engedélyezhető, így alkalmas
+fokozatos bevezetésre már meglévő projectekben is.
+A fordító fejlett, képes az egyes típusok kikövetkeztetésére, így elegendő
+a függvény szignatúráját (valójában elég csak a modulból kiexportált függvények
+szignatúráját) annotálni, a többi típus kikövetkeztethető (inferring).
 
 \section{Az elkészült alkalmazás}
 
@@ -110,6 +114,15 @@ típushelyességének bizonyítására, mindezt a fordítási folyamat részeké
 
 \section{Továbbfejlesztési lehetőségek}
 
-% TODO: scriptable, design ships, etc,
+A játék grafikája jelenleg nagyon sematikus, ezen rengeteg dolog javítható,
+egy érdekes feladat lenne valamilyen WebGL-es megoldással 3 dimenziós grafikát
+adni hozzá.
+
+A játék irányítása sajnos nem túl intuitív, a hajtóművek szabályozása nagyon
+nehéz. Ez egy teljesen szándékos döntés, a későbbiekben szeretnék implementálni
+egy scriptelési réteget a vezérlés fölé, azaz a játékosok az űrhajó API-ját
+felhasználva egy teljesen testreszabható szabályozási rendszert építhet fölé
+(akár intuitívabb vezérlést, de akár egy komplett mesterséges intelligenciát).
+Később a játékosok akár meg is tudnák ezeket a vezérlőket osztani egymással.
 
 \end{document}
