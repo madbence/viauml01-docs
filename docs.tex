@@ -186,7 +186,16 @@ akciót már a pending property nélkül).
 
 \subsection{Perzisztens adatstruktúrák}
 
-% TODO: redux, game logics here
+Az alkalmazás kliens oldali részének állapotát egy egyszerű objektum-gráf
+reprezentálja, a kiváltott akciók ezt az állapotot befolyásolják.
+Azoban az állapot közvetlenül nem módosítható, minden akció egy teljesen
+új állapotot eredményez. Ez nem jelenti azt, hogy minden egyes akció lekezelésekor
+le kellene másolni a meglévő állapot, annak pusztán a megváltozott részét szükséges
+legyártani, a többi részét a gráfnak hivatkozni lehet (hiszen az nem változhat meg később sem).
+
+Ez azt eredményezi, hogy az alkalmazás állapota könnyen elmenthető és visszaállítható
+tetszőleges pontra. Mivel a gráf minden eleme egy egyszerű JavaScript objektum,
+így az állapot sorosítható is (akár localStorage-ba is, így bezárás után is képes megtartani az állapotát).
 
 \section{Továbbfejlesztési lehetőségek}
 
