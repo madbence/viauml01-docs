@@ -3,6 +3,7 @@
 \usepackage{xltxtra}
 \usepackage{graphicx}
 \usepackage{setspace}
+\usepackage{minted}
 \usepackage{hyperref}
 \usepackage[magyar]{babel}
 
@@ -21,6 +22,8 @@
   filecolor=black,
   urlcolor=black
 }
+
+\newminted[js]{javascript}{fontsize=\footnotesize}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{8pt plus 3pt minus 3pt}
@@ -150,6 +153,36 @@ akciót már a pending property nélkül).
   \caption{A Websocket alapú kommunikáció architektúrája}
   \label{fig:ws-arch}
 \end{figure}
+
+\begin{js}
+  const comp = (f, g) => ((s, a) => g(f(s, a), a));
+  const reduce = comp(
+    (state, action) => {
+      while (state.time < action.time) {
+        state = evolve(state, dt);
+      }
+      return state;
+    },
+
+    (state, action) => {
+      return handleUserInput(state, action);
+    }
+  );
+\end{js}
+
+\begin{js}
+  const netTorqe = object.forces.reduce(
+    (torqe, f) => torqe + cross(f.position, unit(f.orientation)) * f.strength,
+    0
+  );
+\end{js}
+
+\begin{js}
+  const netForce = object.forces.reduce(
+    (force, f) => add(force, f),
+    { x: 0, y: 0 }
+  );
+\end{js}
 
 \subsection{Perzisztens adatstruktúrák}
 
