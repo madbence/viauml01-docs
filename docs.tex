@@ -104,6 +104,27 @@ A fordító fejlett, képes az egyes típusok kikövetkeztetésére, így elegen
 a függvény szignatúráját (valójában elég csak a modulból kiexportált függvények
 szignatúráját) annotálni, a többi típus kikövetkeztethető (inferring).
 
+\subsection{redux}
+
+A redux egy állapot-konténer melynek segítségével a fejlesztő egyszerűen képes
+az alkalmazás állapotát egy egységes API-n keresztül módosítani.
+A felhasználó akciókat süt el, melynek hatására a felület frissül.
+Az akciók egyszerű Javascript objektumok, egy kötelező type tulajdonsággal,
+egy opcionális payload és egy szintén opcionális meta propertyvel ellátva.
+
+A type az akció típusát tartalmazza, erre azért van szükség, hogy a sorosítás
+során (amire a Websocket kapcsolat miatt van szükség) ne vesszen el
+típusinformáció.
+A payload az akcióhoz kapcsolódó adatokat (paramétereket) tartalmazza,
+ha van ilyen, akkor az tipikusan egy hagyományos JavaScript objektum (de
+természetesen tetszőleges primitív típus is lehet).
+A meta az akcióhoz szorosan nem kapcsolódó információkat tartalmazza, tipikusan
+szintén egy JavaScript objektum.
+Az alkalmazásban a szerverre felküldendő akciók pending: true propertyvel
+váltódnak ki, így azok nem közvetlenül a kliensen hajtódnak végre, hanem
+Websocket kapcsolaton keresztül a szerveren futnak le (ami tipukusan visszaküldi az
+akciót már a pending property nélkül).
+
 \section{Az elkészült alkalmazás}
 
 % TODO: arch, basic overview
