@@ -74,63 +74,63 @@ lehet megtenni.
 
 \section{Felhasznált techonlógiák}
 
-Az elkészült alkalmazás ES2015 nyelven készült el, ez a JavaScript 2015 nyarán
-szabványosított változata. A szerver NodeJS környezetben fut, így a kliens és
+Az elkészült alkalmazás ES2015 \cite{es2015} nyelven készült el, ez a JavaScript 2015 nyarán
+szabványosított változata. A szerver NodeJS \cite{node} környezetben fut, így a kliens és
 a szerver nagy arányban használja ugyanazt a kódot.
 
-A kliens-szerver kommunikáció Websocket technológián alapul.
+A kliens-szerver kommunikáció Websocket \cite{websocket} technológián alapul.
 Számos absztrakció létezik a kommunikáció részleteinek elfedésére (EngineIO, Primus),
 én azonban az overhead elkerülése végett ezeket nem használtam, pusztán
 a natív Websocket API-ra.
 
-A szerver oldali kiszolgálás a koa webszerver végzi, ami a népszerű express
+A szerver oldali kiszolgálást a \texttt{koa}\cite{koa} webszerver végzi, ami a népszerű \texttt{express}\cite{express}
 szerver következő generációs verziója. A modul API-ja könnyen olvasható,
 a kiszolgálásért ún. middleware-ek felelősek. Ezek aszinkron módon működnek,
 amit a koa egy generátor alapú megoldással tesz kényelmessé.
 Hagyományosan a nyelvben az aszinkron műveletek eredménye (vagy sikertelensége)
 egy ún. callback függvényben kezelhető le (hasonlóan a Java/C\#-ban ismert eseménykezelőkhöz),
-ezt egyszerűsíti le a generátor alapú szintaxis, ami a C\#-ban meglévő async/await
+ezt egyszerűsíti le a generátor alapú szintaxis, ami a C\#-ban meglévő \texttt{async/await}\cite{csasync}
 konstrukciónak felel meg. Jó hír, hogy a nyelv következő változata (ES2016) már
-tartalmazni fog egy hasonló konstrukciót.
+tartalmazni fog egy hasonló konstrukciót\cite{jsasync}.
 Mivel az alkalmazás kódját a Babel transpiler fordítja le futtatható JavaScript
 kódra, így ez a kényelmes konstrukció már elérhető volt számomra is.
 
 \subsection{Babel}
 
-A Babel (korábban 6to5) egy ún. transpiler, azaz olyan compiler, amiben a forrás
+A Babel\cite{babel} (korábban 6to5\cite{6to5}) egy ún. transpiler, azaz olyan compiler, amiben a forrás
 és a célnyelv ugyanaz. A feladata a böngészők (illetve a NodeJS futtatókörnyezet)
 által még nem futtatható JavaScript kód (ES2015) transzformálása egy korábbi,
 általánosan elérhető dialektusra (ES5).
 
 Mivel az alkalmazás moduláris felépítésű, így szükség van az elkészült állományok
 összecsomagolására, ez a böngésző számára a hatékonyabb betöltés miatt szükséges.
-Ezt könnyíti meg a browserify csomag, ami a forrásfájlokból egyetlen, a kliens
-által futtatható bundle-t csinál.
+Ezt könnyíti meg a \texttt{browserify}\cite{browserify} csomag, ami a forrásfájlokból egyetlen, a kliens
+által futtatható \emph{bundle}-t csinál.
 Fejlesztés közben a teljes fordítás sajnos nagyon lassú (ahogy minden más nyelvben),
-így a folyamat felgyorsítására a watchify csomagot használtam, ami inkrementális
+így a folyamat felgyorsítására a \texttt{watchify}\cite{watchify} csomagot használtam, ami \emph{inkrementális}
 fordítást biztosít, illetve folyamatosan figyeli a forrásfájlokat,
 így a fordítás automatikus.
 
 \subsection{Flowtype}
 
 A JavaScript nyelv egyik nagy hátrányának a statikus típusosság hiányát tartják.
-Erre nyújt megoldás a Facebook techonlógiája, a Flowtype, mely a nyelvet
-új nyelvi elemekkel (típusannotációkkal) egészíti ki, és lehetőséget ad a program
+Erre nyújt megoldás a Facebook techonlógiája, a Flowtype\cite{flowtype}, mely a nyelvet
+új nyelvi elemekkel (\emph{típusannotációkkal}) egészíti ki, és lehetőséget ad a program
 típushelyességének bizonyítására, mindezt a fordítási folyamat részeként.
 
-A típusellenőrzés opcionális, a @flow direktívával engedélyezhető, így alkalmas
+A típusellenőrzés opcionális, a \texttt{@flow} direktívával engedélyezhető, így alkalmas
 fokozatos bevezetésre már meglévő projectekben is.
-A fordító fejlett, képes az egyes típusok kikövetkeztetésére, így elegendő
+A fordító fejlett (a \emph{Hindley-Milner}\cite{hindley-milner} típusrendszert használja), képes az egyes típusok kikövetkeztetésére, így elegendő
 a függvény szignatúráját (valójában elég csak a modulból kiexportált függvények
-szignatúráját) annotálni, a többi típus kikövetkeztethető (inferring).
+szignatúráját) annotálni, a többi típus kikövetkeztethető (típus inferencia).
 
 \subsection{redux}
 
-A redux egy állapot-konténer melynek segítségével a fejlesztő egyszerűen képes
-az alkalmazás állapotát egy egységes API-n keresztül módosítani.
+A \texttt{redux}\cite{redux} egy állapot-konténer melynek segítségével a fejlesztő egyszerűen képes
+az alkalmazás állapotát egy egységes \emph{API}-n keresztül módosítani.
 A felhasználó akciókat süt el, melynek hatására a felület frissül.
-Az akciók egyszerű Javascript objektumok, egy kötelező type tulajdonsággal,
-egy opcionális payload és egy szintén opcionális meta propertyvel ellátva.
+Az akciók egyszerű Javascript objektumok, egy kötelező \texttt{type} tulajdonsággal,
+egy opcionális \texttt{payload} és egy szintén opcionális \texttt{meta} propertyvel ellátva.
 
 A type az akció típusát tartalmazza, erre azért van szükség, hogy a sorosítás
 során (amire a Websocket kapcsolat miatt van szükség) ne vesszen el
@@ -147,12 +147,66 @@ akciót már a pending property nélkül).
 
 \section{Az elkészült alkalmazás}
 
+A játéknak az elosztott adatbázisok tipikus problémáját kell megoldania:
+megfelelő reszponzivitást nyújtani a konzisztencia megtartása mellett.
+Mivel mind a szerver, mind a kliens JavaScript-ben van írva, így a játéklogika
+mind a szerveren, mind a kliensen egyszerre (párhuzamosan) fut,
+köztük a megfelelő szinkronizációt kellett csak megoldani.
+
+A játék állapotát akciók kiváltásával lehet megváltoztatni, ezek az akciók
+mindig a felhasználótól erednek, így akciókat csak a kliensek tudnak kiváltani.
+Jelenleg a támogatott akciók a hajók vezérlésével kapcsolatosak (hajtóművek ki
+és bekapcsolása, fegyverek elsütése, játékhoz csatlakozás, játék elhagyása).
+
+A kliens által kiváltott akciók (mivel a kliens generálja őket) nem megbízhatóak
+, mivel a kód a kliens kontrollja alatt áll: adott esetben illegális műveleteket
+hajthatna végre (más játékos avatarjának irányítása, stb.).
+Ennek megelőzésére a szerver a kiváltott akciókon validálást végez (azaz vizsgálja,
+hogy az akció a játék szabályainak megfelel-e).
+Ha az akció végrehajtható, a szerver minden csatlakozott játékosnak elküldi
+a végrehajtott akciót, akik a saját lokális játék-példányukat annak megfelelően módosítják.
+Ezt a működést mutatja be \aref{fig:ws-arch}. ábra.
+
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\textwidth]{figures/ws}
   \caption{A Websocket alapú kommunikáció architektúrája}
   \label{fig:ws-arch}
 \end{figure}
+
+A játéklogika alapvetően két részből áll: első lépésben az objetktumokat a fizika
+törvényeinek megfelelően mozgatni és forgatni kell, majd az akciót ténylegesen végrehajtani.
+Az objektumok mozgásának szimulációja a diszkrét szimulációs módszeren alapszik,
+az egyes entitások minden egyes időszeletben (az időszelet hossza konfigurálható,
+a gyakorlatban a $20ms$ elegendően részletesnek bizonyult) egyenletesen gyorsuló
+mozgást végez:
+
+\[
+  F_e = \sum_{i=0}^nF_i
+\]
+
+\begin{js}
+  const netForce = object.forces.reduce(
+    (force, f) => add(force, f),
+    { x: 0, y: 0 }
+  );
+\end{js}
+
+\[
+  M_e = \sum_{i=0}^n(r_i - R) \times F_i
+\]
+
+\begin{js}
+  const netTorqe = object.forces.reduce(
+    (torqe, f) => torqe + cross(f.position, unit(f.orientation)) * f.strength,
+    0
+  );
+\end{js}
+
+Minden hajóra $F_e$ eredő erő hat, illetve $M_e$ forgatónyomaték hat az $R$ pontban
+(ahol $r_i$ az $i$-edik hajtómű helyzete, $F_i$ az álatala kifejtett erő, $R$ pedig a hajó aktuális pozíciója).
+Az erők alapján a szimuláció Euler integrációval történik.
+A szimuláció pszeudokódja ezek alapján a következő:
 
 \begin{js}
   const comp = (f, g) => ((s, a) => g(f(s, a), a));
@@ -167,20 +221,6 @@ akciót már a pending property nélkül).
     (state, action) => {
       return handleUserInput(state, action);
     }
-  );
-\end{js}
-
-\begin{js}
-  const netTorqe = object.forces.reduce(
-    (torqe, f) => torqe + cross(f.position, unit(f.orientation)) * f.strength,
-    0
-  );
-\end{js}
-
-\begin{js}
-  const netForce = object.forces.reduce(
-    (force, f) => add(force, f),
-    { x: 0, y: 0 }
   );
 \end{js}
 
@@ -209,5 +249,61 @@ egy scriptelési réteget a vezérlés fölé, azaz a játékosok az űrhajó AP
 felhasználva egy teljesen testreszabható szabályozási rendszert építhet fölé
 (akár intuitívabb vezérlést, de akár egy komplett mesterséges intelligenciát).
 Később a játékosok akár meg is tudnák ezeket a vezérlőket osztani egymással.
+
+\begin{thebibliography}{9}
+  \bibitem{es2015}
+  Ecma International, \emph{ECMAScript® 2015 Language Specification},
+  \url{http://www.ecma-international.org/ecma-262/6.0/ECMA-262.pdf}
+
+  \bibitem{node}
+  \emph{NodeJS}, \url{https://nodejs.org}
+
+  \bibitem{websocket}
+  I. Fette, A. Melnikov,
+  \emph{The WebSocket Protocol}
+  \url{https://tools.ietf.org/rfc/rfc6455.txt}
+
+  \bibitem{koa}
+  \emph{Koa - next generation web framework for node.js}
+  \url{http://koajs.com/}
+
+  \bibitem{express}
+  \emph{Fast, unopinionated, minimalist web framework for Node.js}
+  \url{http://expressjs.com/}
+
+  \bibitem{csasync}
+  \emph{Asynchronous Programming with Async and Await}
+  \url{https://msdn.microsoft.com/en-us/library/hh191443.aspx}
+
+  \bibitem{jsasync}
+  \emph{Async Functions}
+  \url{http://tc39.github.io/ecmascript-asyncawait/}
+
+  \bibitem{babel}
+  Babel
+  \url{http://babeljs.io}
+
+  \bibitem{6to5}
+  James Kyle, \emph{Not Born to Die}
+  \url{http://babeljs.io/blog/2015/02/15/not-born-to-die/}
+
+  \bibitem{browserify}
+  James Halliday, \emph{Browserify} \url{http://browserify.org/}
+
+  \bibitem{watchify}
+  James Halliday, \emph{watchify} \url{http://npmjs.com/watchify}
+
+  \bibitem{flowtype}
+  Facebook, \emph{Flowtype} \url{http://flowtype.org}
+
+  \bibitem{hindley-milner}
+  Hindley, J. Roger \emph{The Principal Type-Scheme of an Object in Combinatory Logic}, 1969
+
+  \bibitem{redux}
+  Dan Abramov, \emph{redux} \url{http://rackt.org/redux/}
+
+\end{thebibliography}
+
+A hivatkozott internetes források, ha az másként nincs jelölve, elérhetőek voltak ekkor: \today
 
 \end{document}
