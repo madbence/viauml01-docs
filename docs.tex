@@ -111,6 +111,19 @@ Fejlesztés közben a teljes fordítás sajnos nagyon lassú (ahogy minden más 
 fordítást biztosít, illetve folyamatosan figyeli a forrásfájlokat,
 így a fordítás automatikus.
 
+Az így előálló kód fejlesztési környezetben jól használható, azoban éles környezetben
+nagyon nagy, szükség van a kód tömörítésére, illetve a \emph{sourcemap} áthelyezésére
+(a sourcemap a szimbólum táblának felelne meg natív környezetben).
+Ehhez az \texttt{uglify} és \texttt{exorcist} csomagokat használtam fel.
+A fordítási folyamatot \aref{fig:uglify}. ábra szemlélteti.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{figures/uglify}
+  \caption{A production környezet fordítási folyamata}
+  \label{fig:uglify}
+\end{figure}
+
 \subsection{Flowtype}
 
 A JavaScript nyelv egyik nagy hátrányának a statikus típusosság hiányát tartják.
@@ -158,6 +171,22 @@ amiket aztán továbbít a WebSocket kapcsolatok keresztül.
 
 \section{Az elkészült alkalmazás}
 
+Az elkészült alkalmazás számos különálló komponensből áll, ennek a szerver oldai
+részét szemlélteti \aref{fig:app-arch}. ábra.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/app}
+  \caption{Az alkalmazásszerver architektúrája}
+  \label{fig:app-arch}
+\end{figure}
+
+A szervert a kliensek HTTP vagy Websocket kapcsolaton keresztül érik el, amiket
+egy \texttt{nginx} proxy fogad. Az ő felelőssége az egyes erőforrásokat (kép, html, stb.)
+kiszolgálni (ezt fejlesztési környezetben a node szerver teszi).
+A klienseket a szerveren egy-egy proxy objektum reprezentálja, amik legfeljebb
+egy játékhoz csatlakozva vannak.
+
 A játéknak az elosztott adatbázisok tipikus problémáját kell megoldania:
 megfelelő reszponzivitást nyújtani a konzisztencia megtartása mellett.
 Mivel mind a szerver, mind a kliens JavaScript-ben van írva, így a játéklogika
@@ -183,7 +212,7 @@ Ezt a működést mutatja be \aref{fig:ws-arch}. ábra.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\textwidth]{figures/ws}
-  \caption{A Websocket alapú kommunikáció architektúrája}
+  \caption{A Websocket alapú kommunikáció folyamata}
   \label{fig:ws-arch}
 \end{figure}
 
