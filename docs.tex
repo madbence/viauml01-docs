@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[12pt]{article}
 
 \usepackage{xltxtra}
 \usepackage{graphicx}
@@ -127,7 +127,7 @@ szignatúráját) annotálni, a többi típus kikövetkeztethető (típus infere
 \subsection{redux}
 
 A \texttt{redux}\cite{redux} egy állapot-konténer melynek segítségével a fejlesztő egyszerűen képes
-az alkalmazás állapotát egy egységes \emph{API}-n keresztül módosítani.
+az alkalmazás állapotát (\texttt{store}) egy egységes \emph{API}-n keresztül módosítani.
 A felhasználó akciókat süt el, melynek hatására a felület frissül.
 Az akciók egyszerű Javascript objektumok, egy kötelező \texttt{type} tulajdonsággal,
 egy opcionális \texttt{payload} és egy szintén opcionális \texttt{meta} propertyvel ellátva.
@@ -135,15 +135,26 @@ egy opcionális \texttt{payload} és egy szintén opcionális \texttt{meta} prop
 A type az akció típusát tartalmazza, erre azért van szükség, hogy a sorosítás
 során (amire a Websocket kapcsolat miatt van szükség) ne vesszen el
 típusinformáció.
-A payload az akcióhoz kapcsolódó adatokat (paramétereket) tartalmazza,
+A \texttt{payload} az akcióhoz kapcsolódó adatokat (paramétereket) tartalmazza,
 ha van ilyen, akkor az tipikusan egy hagyományos JavaScript objektum (de
-természetesen tetszőleges primitív típus is lehet).
-A meta az akcióhoz szorosan nem kapcsolódó információkat tartalmazza, tipikusan
+természetesen tetszőleges egyéb primitív típus is lehet).
+A \texttt{meta} az akcióhoz szorosan nem kapcsolódó információkat tartalmazza, tipikusan
 szintén egy JavaScript objektum.
-Az alkalmazásban a szerverre felküldendő akciók pending: true propertyvel
+Az alkalmazásban a szerverre felküldendő akciók \texttt{pending: true} propertyvel
 váltódnak ki, így azok nem közvetlenül a kliensen hajtódnak végre, hanem
 Websocket kapcsolaton keresztül a szerveren futnak le (ami tipukusan visszaküldi az
 akciót már a pending property nélkül).
+
+A kiváltott akciót a \texttt{store} \texttt{dispatch} metódusával tudjuk aktiválni,
+amit a központ alkalmazáslogika egy \texttt{(state, action) => state} típusú
+függvénnyel kezel le. A \texttt{redux} ezt a logikai elemet \emph{reduce}-nek hívja,
+a JavaScriptből ismert \texttt{reduce} függvényhez hasonló működése miatt (más funkcionális nyelvekben
+ez a \texttt{fold} függvénynek felel meg).
+
+Mielőtt az egyek akciók eljutának a központi alkalmazáslogikáig, lehetőség van
+azokat \emph{elkapni}, azokat módosítani, tetszőleges műveletet végezni rajtuk ún. \emph{middleware}-ekkel.
+Az játákban a szerveren végrehajtandó akciókat is egy ilyen middleware kapja el,
+amiket aztán továbbít a WebSocket kapcsolatok keresztül.
 
 \section{Az elkészült alkalmazás}
 
@@ -152,15 +163,17 @@ megfelelő reszponzivitást nyújtani a konzisztencia megtartása mellett.
 Mivel mind a szerver, mind a kliens JavaScript-ben van írva, így a játéklogika
 mind a szerveren, mind a kliensen egyszerre (párhuzamosan) fut,
 köztük a megfelelő szinkronizációt kellett csak megoldani.
+Ez az üzenetek mennyiségét tekintve egy nagyon hatákony megoldás, hiszen amíg
+felhasználói interakció nem történik a játékban, addig mind a szerver, mind a
+kliens azonos állapotot lát (hiszen a szimuláció teljesen determinisztikus).
 
 A játék állapotát akciók kiváltásával lehet megváltoztatni, ezek az akciók
 mindig a felhasználótól erednek, így akciókat csak a kliensek tudnak kiváltani.
 Jelenleg a támogatott akciók a hajók vezérlésével kapcsolatosak (hajtóművek ki
 és bekapcsolása, fegyverek elsütése, játékhoz csatlakozás, játék elhagyása).
 
-A kliens által kiváltott akciók (mivel a kliens generálja őket) nem megbízhatóak
-, mivel a kód a kliens kontrollja alatt áll: adott esetben illegális műveleteket
-hajthatna végre (más játékos avatarjának irányítása, stb.).
+A kliens által kiváltott akciók nem megbízhatóak, mivel a kód a kliens kontrollja alatt áll:
+adott esetben illegális műveleteket hajthatna végre (más játékos avatarjának irányítása, stb.).
 Ennek megelőzésére a szerver a kiváltott akciókon validálást végez (azaz vizsgálja,
 hogy az akció a játék szabályainak megfelel-e).
 Ha az akció végrehajtható, a szerver minden csatlakozott játékosnak elküldi
@@ -205,7 +218,8 @@ mozgást végez:
 
 Minden hajóra $F_e$ eredő erő hat, illetve $M_e$ forgatónyomaték hat az $R$ pontban
 (ahol $r_i$ az $i$-edik hajtómű helyzete, $F_i$ az álatala kifejtett erő, $R$ pedig a hajó aktuális pozíciója).
-Az erők alapján a szimuláció Euler integrációval történik.
+Az erők alapján a szimuláció Euler integrálással történik, ami a ténylegeses lejátszódó
+folyamatnak csak egy durva közelítése, azonban a gyakorlatban elegendően pontosnak bizonyult.
 A szimuláció pszeudokódja ezek alapján a következő:
 
 \begin{js}
@@ -223,6 +237,20 @@ A szimuláció pszeudokódja ezek alapján a következő:
     }
   );
 \end{js}
+
+A \texttt{comp} függvény a függvénykompozícióhoz hasonló működést implementál,
+feladata a két szimulációs lépés összekapcsolása. Az első lépés felelős azért,
+hogy a virtuális világ szinkronban legyen a kiválasztott akcióval, amit a második
+lépésben alkalmaz az aktuális állapotra.
+
+Az így létrejött \texttt{reduce} függvény egy determinisztikus függvény,
+ami a komplett játéklogikát magában foglalja.
+
+A megoldás előnye, hogy \emph{pure function}, azaz nem módosítja a bemeneti
+változókat, a visszatérési értéke pedig csak a bemeneti változóktól függ,
+így nagyon jól tesztelhető: gyors, mivel nem végez költséges IO műveleteket,
+nem igényel bonyolult \emph{setup} és \emph{teardown} folyamatokat, egyszerűen
+a kimenet vizsgálatával eldönthető a működés helyessége.
 
 \subsection{Perzisztens adatstruktúrák}
 
