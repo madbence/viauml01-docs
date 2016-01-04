@@ -6,6 +6,22 @@
 \usepackage{minted}
 \usepackage{hyperref}
 \usepackage[magyar]{babel}
+% \usepackage[top=35mm,right=25mm,bottom=35mm,left=25mm]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\lhead{Node.js backend multiplayer játékhoz}
+\rhead{Dányi Bence}
+\rfoot{\today}
+
+% \setmainfont[
+%   BoldFont={Helvetica Neue LT Pro 55 Roman},
+%   ItalicFont={Helvetica Neue LT Pro 46 Light Italic},
+%   BoldItalicFont={Helvetica Neue LT Pro 56 Italic},
+%   Mapping=tex-text
+% ]{Helvetica Neue LT Pro 45 Light}
+% \setmonofont{InputMonoCompressed Light}
+
 
 \hypersetup{
   bookmarks=true,
@@ -176,7 +192,7 @@ részét szemlélteti \aref{fig:app-arch}. ábra.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.7\textwidth]{figures/app}
+  \includegraphics[width=0.9\textwidth]{figures/app}
   \caption{Az alkalmazásszerver architektúrája}
   \label{fig:app-arch}
 \end{figure}
